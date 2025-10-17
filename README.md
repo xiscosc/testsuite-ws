@@ -71,6 +71,17 @@ The plugin will attempt to auto-detect your Jest configuration. You can also spe
 - **Working Directory**: Project root (auto-detected)
 - **Jest Config**: Optional path to custom Jest configuration
 
+## Test Output
+
+The plugin runs Jest with enhanced output options:
+
+- **`--verbose`**: Shows individual test results for each test case
+- **`--expand`**: Displays full diffs for failed assertions
+- **`--colors`**: Colored output for better readability
+- **`--no-coverage`**: Disables coverage by default for faster test runs
+
+This provides detailed information about which tests ran, which were skipped, and complete error details for failures.
+
 ## Requirements
 
 - WebStorm 2023.3+ or IntelliJ IDEA Ultimate 2023.3+
@@ -94,6 +105,7 @@ TestSuite.new('Suite name')
 it('test name', async () => { });
 test('test name', async () => { });
 describe('group name', () => { });
+it.each([...])('test name with %s', async () => { });
 ```
 
 ## Development

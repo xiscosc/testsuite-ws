@@ -36,6 +36,30 @@ class TestSuiteLineMarkerProvider : RunLineMarkerContributor() {
             )
         }
         
+        // Check if parent is a call expression that matches it.each pattern
+        if (parent is JSCallExpression && TestSuiteTestFinder.isTestElement(parent) && isInsideTestSuite(element)) {
+            val testName = TestSuiteTestFinder.getTestName(parent)
+            return Info(
+                AllIcons.RunConfigurations.TestState.Run,
+                { "Run '${testName ?: "test"}'" },
+                *ExecutorAction.getActions(0)
+            )
+        }
+        
+        // Check if parent's parent is an it.each()(...) call
+        // This handles the case where we're on an identifier that's part of the outer call
+        if (parent.parent is JSCallExpression) {
+            val outerCall = parent.parent as JSCallExpression
+            if (TestSuiteTestFinder.isTestElement(outerCall) && isInsideTestSuite(element)) {
+                val testName = TestSuiteTestFinder.getTestName(outerCall)
+                return Info(
+                    AllIcons.RunConfigurations.TestState.Run,
+                    { "Run '${testName ?: "test"}'" },
+                    *ExecutorAction.getActions(0)
+                )
+            }
+        }
+        
         return null
     }
 
@@ -68,7 +92,27 @@ class TestSuiteLineMarkerProvider : RunLineMarkerContributor() {
         if (parent !is JSCallExpression) return false
         
         val name = element.referenceName
-        return name == "it" || name == "test" || name == "describe"
+        
+        // Check for regular test calls
+        if (name == "it" || name == "test" || name == "describe") {
+            return true
+        }
+        
+        // Check if this is "each" in an it.each([...])('test', ...) pattern
+        // In this case, element is the "each" reference with "it" as qualifier
+        if (name == "each") {
+            val qualifier = element.qualifier
+            if (qualifier is JSReferenceExpression && qualifier.referenceName == "it") {
+                // Check if the parent (it.each([...])) is being called
+                // The parent of parent should be the outer call expression
+                val outerParent = parent.parent
+                if (outerParent is JSCallExpression && outerParent.methodExpression == parent) {
+                    return true
+                }
+            }
+        }
+        
+        return false
     }
 
     private fun isInsideTestSuite(element: PsiElement): Boolean {

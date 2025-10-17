@@ -72,6 +72,19 @@ class TestSuiteTestFinder : TestFinder {
             if (element !is JSCallExpression) return false
             
             val methodExpression = element.methodExpression
+            
+            // Check for it.each([...])('test name', ...) pattern
+            // In this case, methodExpression is the it.each([...]) call itself
+            if (methodExpression is JSCallExpression) {
+                val innerMethodExpr = methodExpression.methodExpression
+                if (innerMethodExpr is JSReferenceExpression && innerMethodExpr.referenceName == "each") {
+                    val qualifier = innerMethodExpr.qualifier
+                    if (qualifier is JSReferenceExpression && qualifier.referenceName == "it") {
+                        return true
+                    }
+                }
+            }
+            
             if (methodExpression is JSReferenceExpression) {
                 val name = methodExpression.referenceName
                 return name == "it" || name == "test" || name == "describe"

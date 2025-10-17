@@ -63,6 +63,15 @@ class TestSuiteRunProfileState(
         
         // Add --colors to get proper colored output
         commandLine.addParameter("--colors")
+        
+        // Add --verbose to show individual test results
+        commandLine.addParameter("--verbose")
+        
+        // Add --expand to show full diffs for failed tests
+        commandLine.addParameter("--expand")
+        
+        // Add --no-coverage to disable coverage by default for faster runs
+        commandLine.addParameter("--no-coverage")
 
         return commandLine
     }
