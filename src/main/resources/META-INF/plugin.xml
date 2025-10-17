@@ -1,0 +1,66 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>com.powerus.testsuite-runner</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>TestSuite Runner</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor email="support@powerus.com" url="https://www.powerus.com">PowerUS</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <description><![CDATA[
+    Enables WebStorm to detect and run tests wrapped in custom TestSuite helper classes.
+    <br><br>
+    This plugin provides:
+    <ul>
+      <li>Test detection for TestSuite.new().build() patterns</li>
+      <li>Gutter icons to run individual tests and test suites</li>
+      <li>Integration with WebStorm's test runner</li>
+      <li>Support for Jest test framework</li>
+    </ul>
+  ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>JavaScript</depends>
+    <depends>NodeJS</depends>
+
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Test Framework -->
+        <configurationType implementation="com.powerus.testsuiterunner.run.TestSuiteRunConfigurationType"/>
+        <programRunner implementation="com.powerus.testsuiterunner.run.TestSuiteRunner"/>
+        
+        <!-- Test Line Marker Provider -->
+        <runLineMarkerContributor language="TypeScript" 
+                                  implementationClass="com.powerus.testsuiterunner.markers.TestSuiteLineMarkerProvider"/>
+        <runLineMarkerContributor language="JavaScript" 
+                                  implementationClass="com.powerus.testsuiterunner.markers.TestSuiteLineMarkerProvider"/>
+        <runLineMarkerContributor language="ECMAScript 6" 
+                                  implementationClass="com.powerus.testsuiterunner.markers.TestSuiteLineMarkerProvider"/>
+        <runLineMarkerContributor language="TypeScript JSX" 
+                                  implementationClass="com.powerus.testsuiterunner.markers.TestSuiteLineMarkerProvider"/>
+        
+        <!-- Run Configuration Producer -->
+        <runConfigurationProducer implementation="com.powerus.testsuiterunner.run.TestSuiteRunConfigurationProducer"/>
+        
+        <!-- Test Finder -->
+        <testFinder implementation="com.powerus.testsuiterunner.TestSuiteTestFinder"/>
+    </extensions>
+
+    <actions>
+        <!-- Add run context menu actions -->
+        <action id="RunTestSuite" class="com.powerus.testsuiterunner.actions.RunTestSuiteAction"
+                text="Run TestSuite"
+                description="Run TestSuite test">
+            <add-to-group group-id="RunContextPopupGroup" anchor="first"/>
+        </action>
+    </actions>
+</idea-plugin>
